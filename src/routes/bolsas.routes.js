@@ -18,7 +18,10 @@ router.post(
         body('modelo').notEmpty().withMessage('El modelo es obligatorio'),
         body('codigo').notEmpty().withMessage('El código es obligatorio'),
         body('talla_id').isInt({ min: 1 }).withMessage('La talla es inválida'),
-        body('color_id').isInt({ min: 1 }).withMessage('El color es inválido'),
+        body('color_id')
+            .optional({ nullable: true })
+            .isInt({ min: 1 })
+            .withMessage('El color es inválido'),
         body('status_id').isInt({ min: 1 }).withMessage('El status es inválido'),
         body('piezas').isInt({ min: 1, max: 1000 }).withMessage('Las piezas deben estar entre 1 y 1000'),
         body('total_piezas').if((value, { req }) => !req.body._esPrimeraBolsa)

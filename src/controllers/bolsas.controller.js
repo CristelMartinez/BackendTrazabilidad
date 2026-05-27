@@ -8,6 +8,7 @@ const crearBolsa = async (req, res) => {
             codigo,
             talla_id,
             color_id,
+            nuevo_color,
             piezas,
             status_id,
             total: totalDelRequest  // campo correcto según schema: "total"
@@ -45,6 +46,44 @@ const crearBolsa = async (req, res) => {
                 mensaje: `Las piezas exceden el total. Solo quedan ${restantes + piezas} piezas disponibles.`
             });
         }
+        let finalColorId = color_id;
+
+        if (nuevo_color && nuevo_color.trim()) {
+
+            const colorNormalizado = nuevo_color.trim();
+
+            let colorExistente = await prisma.colores.findFirst({
+                where: {
+                    modelo,
+                    codigo,
+                    color: {
+                        equals: colorNormalizado,
+                        mode: 'insensitive'
+                    }
+                }
+            });
+
+            if (!colorExistente) {
+
+                colorExistente = await prisma.colores.create({
+                    data: {
+                        modelo,
+                        codigo,
+                        color: colorNormalizado
+                    }
+                });
+            }
+
+            finalColorId = colorExistente.id;
+        }
+
+        if (!finalColorId) {
+
+            return res.status(400).json({
+                ok: false,
+                mensaje: 'Color inválido'
+            });
+        }
 
         const nuevaBolsa = await prisma.bolsas.create({
             data: {
@@ -52,7 +91,7 @@ const crearBolsa = async (req, res) => {
                 modelo,
                 codigo,
                 talla_id,
-                color_id,
+                color_id: finalColorId,
                 piezas,
                 status_id,
                 total,       // campo correcto
@@ -63,9 +102,15 @@ const crearBolsa = async (req, res) => {
         res.status(201).json({ ok: true, bolsa: nuevaBolsa });
 
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ ok: false, mensaje: 'Error al crear bolsa' });
-    }
+
+    console.error('ERROR COMPLETO:');
+    console.error(error);
+
+    return res.status(500).json({
+        ok: false,
+        mensaje: error.message
+    });
+}
 };
 
 const obtenerBolsas = async (req, res) => {
