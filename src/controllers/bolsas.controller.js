@@ -34,10 +34,27 @@ const crearBolsa = async (req, res) => {
 
             const piezasAcumuladas = agregado._sum.piezas || 0;
             restantes = total - piezasAcumuladas - piezas;
+
+            // Tope real es total + 100 (merma)
+            if (restantes < -100) {
+                return res.status(400).json({
+                    ok: false,
+                    mensaje: `Las piezas exceden el límite. Máximo permitido con merma: ${total + 100 - piezasAcumuladas} piezas.`
+                });
+            }
+
         } else {
             // Primera bolsa del grupo
             total = totalDelRequest;
             restantes = total - piezas;
+
+            // También aplica merma en primera bolsa
+            if (restantes < -100) {
+                return res.status(400).json({
+                    ok: false,
+                    mensaje: `Las piezas exceden el límite. Máximo permitido con merma: ${total + 100} piezas.`
+                });
+            }
         }
 
         if (restantes < 0) {
@@ -94,14 +111,14 @@ const crearBolsa = async (req, res) => {
 
     } catch (error) {
 
-    console.error('ERROR COMPLETO:');
-    console.error(error);
+        console.error('ERROR COMPLETO:');
+        console.error(error);
 
-    return res.status(500).json({
-        ok: false,
-        mensaje: error.message
-    });
-}
+        return res.status(500).json({
+            ok: false,
+            mensaje: error.message
+        });
+    }
 };
 
 const obtenerBolsas = async (req, res) => {
@@ -193,7 +210,7 @@ const obtenerRestantes = async (req, res) => {
         });
 
         const asignadas = agregado._sum.piezas || 0;
-        const restantes = bolsaExistente.total - asignadas;
+        const restantes = bolsaExistente.total + 100 - asignadas;
 
         res.json({
             ok: true,
