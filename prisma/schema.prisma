@@ -1,0 +1,71 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Tallas {
+  id      Int     @id @default(autoincrement())
+  talla   String  @unique @db.VarChar(20)
+  codigo  String? @db.VarChar(20)
+
+  bolsas  Bolsas[]
+}
+
+model Colores {
+  id      Int     @id @default(autoincrement())
+  modelo  String? @db.VarChar(50)
+  codigo  String? @db.VarChar(50)
+  color   String  @db.VarChar(50)
+
+  bolsas  Bolsas[]
+}
+
+model Status {
+  id      Int     @id @default(autoincrement())
+  status  String  @unique @db.VarChar(50)
+
+  bolsas  Bolsas[]
+}
+
+model Usuarios {
+  id          Int    @id @default(autoincrement())
+  usuario     String @unique @db.VarChar(50)
+  contrasena  String @db.VarChar(255)
+  tipo        String @db.VarChar(20)
+}
+
+model Bolsas {
+  id              Int       @id @default(autoincrement())
+
+  folio           Int       @unique @default(autoincrement())
+
+  numero_pedido   String    @db.VarChar(50)
+
+  modelo          String    @db.VarChar(50)
+
+  codigo          String    @db.VarChar(50)
+
+  talla_id        Int
+
+  color_id        Int
+
+  piezas          Int
+
+  restantes       Int       @default(0)
+
+  total           Int       @default(0)
+
+  status_id       Int
+
+  fecha_registro  DateTime  @default(now())
+
+  talla           Tallas    @relation(fields: [talla_id], references: [id])
+
+  color           Colores   @relation(fields: [color_id], references: [id])
+
+  status          Status    @relation(fields: [status_id], references: [id])
+}

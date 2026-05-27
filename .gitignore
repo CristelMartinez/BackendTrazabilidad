@@ -1,0 +1,14 @@
+node_modules
+.env
+.vscode
+.DS_Store
+
+generated
+prisma/generated
+
+*.log
+npm-debug.log*
+
+coverage
+dist
+build
