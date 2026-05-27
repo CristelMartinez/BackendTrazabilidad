@@ -76,15 +76,6 @@ const crearBolsa = async (req, res) => {
 
             finalColorId = colorExistente.id;
         }
-
-        if (!finalColorId) {
-
-            return res.status(400).json({
-                ok: false,
-                mensaje: 'Color inválido'
-            });
-        }
-
         const nuevaBolsa = await prisma.bolsas.create({
             data: {
                 numero_pedido,

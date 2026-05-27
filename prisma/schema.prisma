@@ -51,7 +51,7 @@ model Bolsas {
 
   talla_id        Int
 
-  color_id        Int
+  color_id        Int?
 
   piezas          Int
 
@@ -65,7 +65,7 @@ model Bolsas {
 
   talla           Tallas    @relation(fields: [talla_id], references: [id])
 
-  color           Colores   @relation(fields: [color_id], references: [id])
+  color           Colores? @relation(fields: [color_id], references: [id])
 
   status          Status    @relation(fields: [status_id], references: [id])
 }
